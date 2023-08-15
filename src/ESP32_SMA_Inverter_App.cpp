@@ -94,6 +94,8 @@ void loop() {
 }
 
 void ESP32_SMA_Inverter_App::appLoop() { 
+   ArduinoOTA.handle();
+
   int adjustedScanRate;
   // connect or reconnect after connection lost 
   if (nightTime)  // Scan every 15min

@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <ArduinoOTA.h>
 
 #include <Preferences.h>
 #include <ArduinoJson.h>
