@@ -46,7 +46,7 @@ public:
      void formPage ();
      void handleForm();
      void brokerConnect();
-     bool publishData();
+     void publishData();
      void hassAutoDiscover(int timeout);
      void sendLongMQTT(const char *topic, const char *postscript, const char *msg);
      void logViaMQTT(const char *logStr);

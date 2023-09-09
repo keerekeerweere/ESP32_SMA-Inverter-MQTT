@@ -95,11 +95,19 @@ void loop() {
 
 void ESP32_SMA_Inverter_App::appLoop() { 
   int adjustedScanRate;
-  // connect or reconnect after connection lost 
-  if (nightTime)  // Scan every 15min
-    adjustedScanRate = 900000;
-  else
+  struct tm timeinfo;
+  InverterData& invData = ESP32_SMA_Inverter::getInstance().invData;
+  bool ntpWorking = getLocalTime(&timeinfo);
+
+// Check if the Sun is up or the grid relay is closed
+  if ((ntpWorking && (timeinfo.tm_hour >= SUNUP) && (timeinfo.tm_hour <= SUNDOWN)) || (invData.GridRelay == 51)){
+    nightTime = false;
     adjustedScanRate = (appConfig.scanRate * 1000);
+  } else {
+    nightTime = true;
+    adjustedScanRate = NIGHTSCANRATE;
+  }
+  // connect or reconnect after connection lost 
   if ( !smartConfig && (nextTime < millis()) && (!smaInverter.isBtConnected())) {
     nextTime = millis() + adjustedScanRate;
     if(nightTime)
@@ -141,8 +149,7 @@ void ESP32_SMA_Inverter_App::appLoop() {
         delay(5000);
       }
 
-      nightTime = mqttInstanceForApp.publishData();
-      if ( nightTime != dayNight) {
+      if ( nightTime != dayNight ) {
         if (appConfig.mqttBroker.length() > 0) {
           if (nightTime) { // Change the expire time in home Assistant
             mqttInstanceForApp.hassAutoDiscover(1800);
@@ -152,8 +159,16 @@ void ESP32_SMA_Inverter_App::appLoop() {
         }
         dayNight = nightTime;
       }
+      mqttInstanceForApp.publishData();
+      failCount=0;
     } else {  
       mqttInstanceForApp.logViaMQTT("Bluetooth failed to connect");
+      failCount++;
+      if( failCount > 5 ) {
+        logW("Failed to connect 5 times: Reboot\n");
+        ESP.restart();
+      }
+
     } 
   }
   // DEBUG1_PRINT(".");

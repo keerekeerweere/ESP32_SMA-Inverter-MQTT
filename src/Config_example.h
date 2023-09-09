@@ -29,6 +29,9 @@
 #define HASS_STATE_TOPIC "homeassistant/sensor/%s/state"
 #define TIMEZONE 1
 #define NTPHOSTNAME "pool.ntp.org"
+#define SUNUP 6
+#define SUNDOWN 18
+#define NIGHTSCANRATE 15*60*1000
 
 
 

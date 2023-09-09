@@ -117,6 +117,7 @@ class ESP32_SMA_Inverter_App : public ESP32Loggable {
         //uint8_t  espBTAddress[6]; // is retrieved from BT packet
 
         uint32_t nextTime = 0;
+        int failCount = 0;
 
         const String confFile = "/config.txt"; //extern const char *confFile = "/config.txt";  
 

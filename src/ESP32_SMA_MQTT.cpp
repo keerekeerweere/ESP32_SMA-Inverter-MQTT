@@ -197,7 +197,7 @@ void ESP32_SMA_MQTT::wifiLoop(){
   unsigned long currentMillis = millis();
   // if WiFi is down, try reconnecting
   if ((WiFi.status() != WL_CONNECTED) && (currentMillis - mqttInstance.previousMillis >= mqttInstance.interval)) {
-    log_w("Reconnecting to WiFi...\n");
+    logW("Reconnecting to WiFi...\n");
     WiFi.disconnect();
     WiFi.reconnect();
     mqttInstance.previousMillis = currentMillis;
@@ -215,7 +215,7 @@ void ESP32_SMA_MQTT::formPage () {
   char fulltopic[100];
 
   responseHTML = (char *)malloc(sizeof(char)*10000);
-  log_w("Connect formpage\n");
+  logW("Connect formpage\n");
   strcpy(responseHTML, "<!DOCTYPE html><html><head>\
                       <title>SMA Inverter</title></head><body>\
                       <style>\
@@ -309,17 +309,17 @@ table, th, td {\
 void ESP32_SMA_MQTT::handleForm() {
   AppConfig& config = ESP32_SMA_Inverter_App::getInstance().appConfig;
 
-  log_w("Connect handleForm\n");
+  logW("Connect handleForm\n");
   if (ESP32_SMA_Inverter_App::webServer.method() != HTTP_POST) {
     ESP32_SMA_Inverter_App::webServer.send(405, "text/plain", "Method Not Allowed");
   } else {
-    log_w("POST form was:");
+    logW("POST form was:");
     config.hassDisc = false;
     for (uint8_t i = 0; i < ESP32_SMA_Inverter_App::webServer.args(); i++) {
       String name = ESP32_SMA_Inverter_App::webServer.argName(i);
       String v = ESP32_SMA_Inverter_App::webServer.arg(i);
       v.trim();
-      log_w("%s: %s ",name.c_str(), v.c_str());
+      logW("%s: %s ",name.c_str(), v.c_str());
       if (name == "mqttBroker") {
         config.mqttBroker = v.c_str();
       } else if (name == "mqttPort") {
@@ -338,7 +338,7 @@ void ESP32_SMA_MQTT::handleForm() {
       } else if (name == "scanRate") {
         config.scanRate = atoi(v.c_str());
       } else if (name == "hassDisc") {
-        log_w("%s\n",v.c_str());
+        logW("%s\n",v.c_str());
         config.hassDisc = true;
       } else if (name == "timezone") {
         config.timezone = atof(v.c_str());
@@ -359,24 +359,24 @@ void ESP32_SMA_MQTT::brokerConnect() {
   if(config.mqttBroker.length() < 1 ){
     return;
   }
-  log_w("Connecting to MQTT Broker");
+  logW("Connecting to MQTT Broker");
 
   ESP32_SMA_Inverter_App::client.setServer(config.mqttBroker.c_str(), config.mqttPort);
 
   // client.setCallback(callback);
   for(int i =0; i < 3;i++) {
     if ( !ESP32_SMA_Inverter_App::client.connected()){
-      log_w("The client %s connects to the mqtt broker %s ", mqttInstance.sapString.c_str(), config.mqttBroker.c_str());
+      logW("The client %s connects to the mqtt broker %s ", mqttInstance.sapString.c_str(), config.mqttBroker.c_str());
       // If there is a user account
       if(config.mqttUser.length() > 1){
-        log_w(" with user/password\n");
+        logW(" with user/password\n");
         if (ESP32_SMA_Inverter_App::client.connect(mqttInstance.sapString.c_str(),config.mqttUser.c_str(),config.mqttPasswd.c_str())) {
         } else {
           log_e("mqtt connect failed with state %i",ESP32_SMA_Inverter_App::client.state());
           delay(2000);
         }
       } else {
-        log_w(" without user/password ");
+        logW(" without user/password ");
         if (ESP32_SMA_Inverter_App::client.connect(mqttInstance.sapString.c_str())) {
         } else {
           log_e("mqtt connect failed with state %i", ESP32_SMA_Inverter_App::client.state());
@@ -388,13 +388,13 @@ void ESP32_SMA_MQTT::brokerConnect() {
 }
 
 // Returns true if nighttime
-bool ESP32_SMA_MQTT::publishData(){
+void ESP32_SMA_MQTT::publishData(){
   InverterData& invData = ESP32_SMA_Inverter::getInstance().invData;
   DisplayData& dispData = ESP32_SMA_Inverter::getInstance().dispData;
   AppConfig& config = ESP32_SMA_Inverter_App::getInstance().appConfig;
 
   if(config.mqttBroker.length() < 1 ){
-    return(false);
+    return;
   }
 
   brokerConnect();
@@ -405,7 +405,7 @@ bool ESP32_SMA_MQTT::publishData(){
 
 
     snprintf(theData,sizeof(theData)-1,
-    "{ \"Serial\": %d, \"BTStrength\": %6.2f, \"Uac\": [ %6.2f, %6.2f, %6.2f ], \"Iac\": [ %6.2f, %6.2f, %6.2f ], \"Pac\": %6.2f, \"Udc\": [ %6.2f , %6.2f ], \"Idc\": [ %6.2f , %6.2f ], \"Wdc\": [%6.2f , %6.2f ], \"Freq\": %5.2f, \"EToday\": %6.2f, \"ETotal\": %15.2f, \"InvTemp\": %4.2f, \"DevStatus\": \"%s\", \"GridRelay\": \"%s\" }"
+    "{ \"Serial\": %d, \"BTStrength\": %6.2f, \"Uac\": [ %6.2f, %6.2f, %6.2f ], \"Iac\": [ %6.2f, %6.2f, %6.2f ], \"Pac\": %6.0f, \"Udc\": [ %6.2f , %6.2f ], \"Idc\": [ %6.2f , %6.2f ], \"Wdc\": [%6.0f , %6.0f ], \"Freq\": %5.2f, \"EToday\": %6.2f, \"ETotal\": %15.2f, \"InvTemp\": %4.2f, \"DevStatus\": \"%s\", \"GridRelay\": \"%s\" }"
  , invData.Serial
  , dispData.BTSigStrength
  , dispData.Uac[0],dispData.Uac[1],dispData.Uac[2]
@@ -413,7 +413,7 @@ bool ESP32_SMA_MQTT::publishData(){
  , dispData.Pac
  , dispData.Udc[0], dispData.Udc[1]
  , dispData.Idc[0], dispData.Idc[1]
- , dispData.Udc[0] * dispData.Idc[0] / 1000 , dispData.Udc[1] * dispData.Idc[1] / 1000
+ , dispData.Udc[0] * dispData.Idc[0] , dispData.Udc[1] * dispData.Idc[1]
  , dispData.Freq
  , dispData.EToday
  , dispData.ETotal
@@ -429,9 +429,7 @@ bool ESP32_SMA_MQTT::publishData(){
       snprintf(topic,sizeof(topic), "sma/solar/%s-%d/state",config.mqttTopic.c_str(), invData.Serial);
     else
       snprintf(topic,sizeof(topic), "%s-%d/state",config.mqttTopic.c_str(), invData.Serial);
-    logI(topic);
-    logI(" = ");
-    logI("%s\n",theData);
+    logI("%s = %s",topic, theData);
     int len = strlen(theData);
     ESP32_SMA_Inverter_App::client.beginPublish(topic,len,false);
     if (ESP32_SMA_Inverter_App::client.print(theData))
@@ -440,11 +438,6 @@ bool ESP32_SMA_MQTT::publishData(){
       logW("Failed Publish\n");
     ESP32_SMA_Inverter_App::client.endPublish();
   }
-  // If Power is zero, it's night time
-  if (dispData.Pac > 0)
-    return(false);
-  else
-    return(true);
 }
 
 void ESP32_SMA_MQTT::logViaMQTT(const char *logStr){
@@ -493,7 +486,7 @@ void ESP32_SMA_MQTT::hassAutoDiscover(int timeout){
   snprintf(topic,sizeof(topic)-1, "%s-%d",config.mqttTopic.c_str(), invData.Serial);
   const size_t msg_size = sizeof(msg);
 
-    sendHassAuto(msg, msg_size, timeout, topic, "power", "AC Power", "kW", "Pac", "Pac");
+    sendHassAuto(msg, msg_size, timeout, topic, "power", "AC Power", "W", "Pac", "Pac");
     sendHassAuto(msg, msg_size, timeout, topic, "current", "A Phase Current", "A", "Iac[0]", "Iac0");
     sendHassAuto(msg, msg_size, timeout, topic, "current", "B Phase Current", "A", "Iac[1]", "Iac1");
     sendHassAuto(msg, msg_size, timeout, topic, "current", "C Phase Current", "A", "Iac[2]", "Iac2");
@@ -501,8 +494,8 @@ void ESP32_SMA_MQTT::hassAutoDiscover(int timeout){
     sendHassAuto(msg, msg_size, timeout, topic, "voltage", "B Phase Voltage", "V", "Uac[1]", "Uac1");
     sendHassAuto(msg, msg_size, timeout, topic, "voltage", "C Phase Voltage", "V", "Uac[2]", "Uac2");
     sendHassAuto(msg, msg_size, timeout, topic, "frequency", "AC Frequency", "Hz", "Freq", "Freq");
-    sendHassAuto(msg, msg_size, timeout, topic, "power", "DC Power (String 1)", "kW", "Wdc[0]", "Wdc0");
-    sendHassAuto(msg, msg_size, timeout, topic, "power", "DC Power (String 2)", "kW", "Wdc[1]", "Wdc1");
+    sendHassAuto(msg, msg_size, timeout, topic, "power", "DC Power (String 1)", "W", "Wdc[0]", "Wdc0");
+    sendHassAuto(msg, msg_size, timeout, topic, "power", "DC Power (String 2)", "W", "Wdc[1]", "Wdc1");
     sendHassAuto(msg, msg_size, timeout, topic, "voltage", "DC Voltage (String 1)", "V", "Udc[0]", "Udc0");
     sendHassAuto(msg, msg_size, timeout, topic, "voltage", "DC Voltage (String 2)", "V", "Udc[1]", "Udc1");
     sendHassAuto(msg, msg_size, timeout, topic, "current", "DC Current (String 1)", "A", "Idc[0]", "Idc0");
@@ -546,7 +539,7 @@ void ESP32_SMA_MQTT::sendLongMQTT(const char *topic, const char *postscript, con
   char tmpstr[100];
   snprintf(tmpstr,sizeof(tmpstr),"homeassistant/sensor/%s/%s/config",topic,postscript);
   ESP32_SMA_Inverter_App::client.beginPublish(tmpstr,len,true);
-  logI("%s -> %s... ",tmpstr,msg);
+  logI("%s:  %s... ",tmpstr,msg);
    if (ESP32_SMA_Inverter_App::client.print(msg))
       logI("Published\n");
     else
