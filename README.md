@@ -9,12 +9,12 @@ Forked from the great work of Darryl Bond and of Lupo135.
 Many thanks for the work on these projects!
 
 
-COMPILE:
-Use "Arduino Tools->Partition Scheme: No OTA(2MB APP/2MB SPIFFS)" or Huge App  because the program needs aprox. 1.5MB program space.
+### COMPILE:
+A working VSCode installation must be installed with the PlatformIO plugin installed
 
-SETUP:
+### SETUP:
 To first configure:
-  - Find the Bluetooth address of your Inverter ( Connect to SMAxxx with smart phone and noet the displayed device bluetooth address)
+  - Find the Bluetooth address of your Inverter ( Connect to SMAxxx with smart phone and note the displayed device bluetooth address)
   - Plug the device in, If possible connect the Serial Monitor to check on output
   - Use ESP Touch App found in Apple Store, or Google Play to configure the IP Address, Note the IP Address given
   - Browse to the IP address.
@@ -26,18 +26,18 @@ To first configure:
   - Device will reboot and should display successful connects to the inverter and mqtt server on the serial monitor
   - In Home Assistant add an entities card and search for entities starting with SMA-XXXXXXXXXXX
 
+### Home Assistant
+The device performs Home Assistant auto-discovery via MQTT
+The inverter is added as a device, while all the inverter parameters are defined in Home Assistant entities. The entity label begins with the topic preamble and inverter serial. 
+Device name: SMA-21005XXXXX
+Entity label: sma_21005XXXXX_grid_relay_status
 
-Additions:
-  - Now displaying Temperature, Grid relay and inverter status
-  - home assistant device configuration, works with auto discovery feature via MQTT
 
-NOTES:
+### NOTES:
 
-TODO:
+### TODO:
   - Read month and year History
   - refactor code a bit more for more clarity
   - should be possible to merge/fork with the sbfspot project, or at least re-use more code from it without needing to port.
   - should also be possible to directly integrate into Home Assistant through esphome without the going through mqtt. Also this allows OTA update and (re)configuration through yaml files. see my first attempt here: https://github.com/keerekeerweere/esphome_smabluetooth
 
-KNOWN BUGS:
-  - first time setup somehow ignores the default settings of config_values.h, cleanup the first init
