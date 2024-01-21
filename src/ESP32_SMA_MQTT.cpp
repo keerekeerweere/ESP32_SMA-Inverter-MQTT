@@ -274,7 +274,7 @@ table, th, td {\
  <tr><td>BT Signal Strength</td><td>%4.1f %</td></tr>\n\
   <tr><td>Uac</td><td>A: %15.1f ,B: %15.1f ,C: %15.1f V</td></tr>\n\
  <tr><td>Iac</td><td>A: %15.1f ,B: %15.1f ,C: %15.1f A</td></tr>\n\
- <tr><td>Pac</td><td>%15.2f kW</td></tr>\n\
+ <tr><td>Pac</td><td>%15.0f W</td></tr>\n\
  <tr><td>Udc</td><td>String 1: %15.1f V, String 2: %15.1f V</td></tr>\n\
  <tr><td>Idc</td><td>String 1: %15.1f A, String 2: %15.1f A</td></tr>\n\
  <tr><td>Wdc</td><td>String 1: %15.1f kW, String 2: %15.1f kW</td></tr>\n"
