@@ -62,8 +62,8 @@ bool ESP32_SMA_Inverter::isValidSender(uint8_t expAddr[6], uint8_t isAddr[6]) {
   for (int i = 0; i < 6; i++)
     if ((isAddr[i] != expAddr[i]) && (expAddr[i] != 0xFF)) {
       logV("Shoud-Addr: %02X %02X %02X %02X %02X %02X\n   Is-Addr: %02X %02X %02X %02X %02X %02X\n",
-        expAddr[5], expAddr[4], expAddr[3], expAddr[2], expAddr[1], expAddr[5],
-         isAddr[5],  isAddr[4],  isAddr[3],  isAddr[2],  isAddr[1],  isAddr[5]);
+        expAddr[5], expAddr[4], expAddr[3], expAddr[2], expAddr[1], expAddr[0],
+         isAddr[5],  isAddr[4],  isAddr[3],  isAddr[2],  isAddr[1],  isAddr[0]);
         return false;
     }
   return true;
