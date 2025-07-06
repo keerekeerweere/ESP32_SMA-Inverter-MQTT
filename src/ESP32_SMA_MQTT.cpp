@@ -405,7 +405,20 @@ void ESP32_SMA_MQTT::publishData(){
 
 
     snprintf(theData,sizeof(theData)-1,
-    "{ \"Serial\": %d, \"BTStrength\": %6.2f, \"Uac\": [ %6.2f, %6.2f, %6.2f ], \"Iac\": [ %6.2f, %6.2f, %6.2f ], \"Pac\": %6.0f, \"Udc\": [ %6.2f , %6.2f ], \"Idc\": [ %6.2f , %6.2f ], \"Wdc\": [%6.0f , %6.0f ], \"Freq\": %5.2f, \"EToday\": %6.2f, \"ETotal\": %15.2f, \"InvTemp\": %4.2f, \"DevStatus\": \"%s\", \"GridRelay\": \"%s\" }"
+    "{ \"Serial\": %d, "
+    "\"BTStrength\": %6.2f, "
+    "\"Uac\": [ %6.2f, %6.2f, %6.2f ], "
+    "\"Iac\": [ %6.2f, %6.2f, %6.2f ], "
+    "\"Pac\": %6.0f, "
+    "\"Udc\": [ %6.2f , %6.2f ], "
+    "\"Idc\": [ %6.2f , %6.2f ], "
+    "\"Wdc\": [%6.0f , %6.0f ], "
+    "\"Freq\": %5.2f, "
+    "\"EToday\": %6.2f, "
+    "\"ETotal\": %15.2f, "
+    "\"InvTemp\": %4.2f, "
+    "\"DevStatus\": \"%s\", "
+    "\"GridRelay\": \"%s\" }"
  , invData.Serial
  , dispData.BTSigStrength
  , dispData.Uac[0],dispData.Uac[1],dispData.Uac[2]
