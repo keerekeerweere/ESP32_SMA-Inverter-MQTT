@@ -107,7 +107,7 @@ void ESP32_SMA_MQTT::wifiStartup(){
   logD("Using config");
 
   AppConfig& config = ESP32_SMA_Inverter_App::getInstance().appConfig;
-  logD("mqtt topic: %s", config.mqttTopic);
+  logD("mqtt topic: %s", config.mqttTopic.c_str());
   if (config.mqttTopic == "")
     config.mqttTopic = mqttInstance.sapString;
   int i = 0;
