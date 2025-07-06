@@ -27,10 +27,10 @@ To first configure:
   - In Home Assistant add an entities card and search for entities starting with SMA-XXXXXXXXXXX
 
 ### Home Assistant
-The device performs Home Assistant auto-discovery via MQTT
-The inverter is added as a device, while all the inverter parameters are defined in Home Assistant entities. The entity label begins with the topic preamble and inverter serial. 
-Device name: SMA-21005XXXXX
-Entity label: sma_21005XXXXX_grid_relay_status
+The device performs Home Assistant auto-discovery via MQTT.  
+The inverter is added as a device, while all the inverter parameters are defined in Home Assistant entities. The entity label begins with the topic preamble and inverter serial.  
+  - Device name: SMA-21005XXXXX
+  - Entity label: sma_21005XXXXX_grid_relay_status
 
 
 ### NOTES:
